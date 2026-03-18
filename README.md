@@ -188,9 +188,9 @@ Note that often times when making big schema changes you can run the risk of los
 
 #### Local development
 
-Ideally we recommend running a local copy of your database so that schema updates are as fast as possible. By default the Postgres adapter has `push: true` for development environments. This will let you add, modify and remove fields and collections without needing to run any data migrations.
+This project is configured to be migration-first in every environment. Automatic schema push is disabled by default so local schema changes stay aligned with production migrations.
 
-If your database is pointed to production you will want to set `push: false` otherwise you will risk losing data or having your migrations out of sync.
+If you intentionally want Payload to push schema changes directly during development, set `PAYLOAD_DB_PUSH=true` in your environment. Leave it disabled for normal work so your Docker Postgres database and Neon stay in sync.
 
 #### Migrations
 
@@ -199,7 +199,7 @@ If your database is pointed to production you will want to set `push: false` oth
 Locally create a migration
 
 ```bash
-pnpm payload migrate:create
+pnpm db:migrate:create my_migration_name
 ```
 
 This creates the migration files you will need to push alongside with your new configuration.
@@ -207,7 +207,7 @@ This creates the migration files you will need to push alongside with your new c
 On the server after building and before running `pnpm start` you will want to run your migrations
 
 ```bash
-pnpm payload migrate
+pnpm db:migrate
 ```
 
 This command will check for any migrations that have not yet been run and try to run them and it will keep a record of migrations that have been run in the database.

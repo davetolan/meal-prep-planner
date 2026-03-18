@@ -58,6 +58,8 @@ export default buildConfig({
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: postgresAdapter({
+    // Default to migration-first so local schema changes stay in sync with Neon deployments.
+    push: process.env.PAYLOAD_DB_PUSH === 'true',
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },

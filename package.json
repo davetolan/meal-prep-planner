@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "db:migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
+    "db:migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
+    "db:migrate:status": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:status",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",

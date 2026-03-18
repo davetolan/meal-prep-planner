@@ -9,20 +9,22 @@ services:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
     working_dir: /home/node/app/
-    command: sh -c "yarn install && yarn dev"
+    command: sh -c "corepack enable && pnpm install && pnpm dev"
     depends_on:
-      - mongo
+      - postgres
     env_file:
       - .env
 
-  mongo:
-    image: mongo:latest
+  postgres:
+    image: postgres:16-alpine
     ports:
-      - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: meal_prep_planner
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - data:/data/db
+      - data:/var/lib/postgresql/data
     logging:
       driver: none
 
