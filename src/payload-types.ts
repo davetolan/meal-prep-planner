@@ -71,6 +71,8 @@ export interface Config {
     posts: Post;
     media: Media;
     categories: Category;
+    recipes: Recipe;
+    'meal-plans': MealPlan;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -93,6 +95,8 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    recipes: RecipesSelect<false> | RecipesSelect<true>;
+    'meal-plans': MealPlansSelect<false> | MealPlansSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -783,6 +787,69 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recipes".
+ */
+export interface Recipe {
+  id: number;
+  name: string;
+  ingredients?:
+    | {
+        ingredient: string;
+        id?: string | null;
+      }[]
+    | null;
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Prep time in minutes.
+   */
+  prepTime?: number | null;
+  batchable?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "meal-plans".
+ */
+export interface MealPlan {
+  id: number;
+  name: string;
+  days?:
+    | {
+        day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+        id?: string | null;
+      }[]
+    | null;
+  meals?:
+    | {
+        day?: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday') | null;
+        meal: string;
+        recipe?: (number | null) | Recipe;
+        id?: string | null;
+      }[]
+    | null;
+  groceryList?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  prepSteps?:
+    | {
+        step: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -986,6 +1053,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'recipes';
+        value: number | Recipe;
+      } | null)
+    | ({
+        relationTo: 'meal-plans';
+        value: number | MealPlan;
       } | null)
     | ({
         relationTo: 'users';
@@ -1328,6 +1403,64 @@ export interface CategoriesSelect<T extends boolean = true> {
         doc?: T;
         url?: T;
         label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recipes_select".
+ */
+export interface RecipesSelect<T extends boolean = true> {
+  name?: T;
+  ingredients?:
+    | T
+    | {
+        ingredient?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  prepTime?: T;
+  batchable?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "meal-plans_select".
+ */
+export interface MealPlansSelect<T extends boolean = true> {
+  name?: T;
+  days?:
+    | T
+    | {
+        day?: T;
+        id?: T;
+      };
+  meals?:
+    | T
+    | {
+        day?: T;
+        meal?: T;
+        recipe?: T;
+        id?: T;
+      };
+  groceryList?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  prepSteps?:
+    | T
+    | {
+        step?: T;
         id?: T;
       };
   updatedAt?: T;
