@@ -10,7 +10,6 @@ try {
   const recipes = await loadPlannerRecipes(payload)
   const plan = generateMealPlan(recipes, {
     days: 4,
-    targetProteinPerDay: 80,
   })
 
   console.log(JSON.stringify(plan, null, 2))

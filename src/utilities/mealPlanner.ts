@@ -62,7 +62,6 @@ export type GenerateMealPlanOptions = {
   people?: number
   preferences?: string[]
   exclusions?: string[]
-  targetProteinPerDay?: number
   recipeCount?: number
 }
 
@@ -110,7 +109,6 @@ type GroceryAggregate = {
 const DEFAULT_DAYS = 5
 const MIN_DAYS = 3
 const MAX_DAYS = 5
-const DEFAULT_TARGET_PROTEIN_PER_DAY = 70
 const MIN_RECIPE_COUNT = 2
 const MAX_RECIPE_COUNT = 3
 
@@ -213,43 +211,7 @@ function getRecipeCount(dayCount: number, requestedRecipeCount?: number): number
   return Math.min(MAX_RECIPE_COUNT, Math.max(MIN_RECIPE_COUNT, Math.round(requestedRecipeCount)))
 }
 
-function buildDailyPairScore(args: {
-  counts: Map<string, number>
-  previousPair?: [NormalizedRecipe, NormalizedRecipe]
-  selectedRecipes: NormalizedRecipe[]
-  lunch: NormalizedRecipe
-  dinner: NormalizedRecipe
-  preferences: string[]
-  targetProteinPerDay: number
-}): number {
-  const { counts, previousPair, selectedRecipes, lunch, dinner, preferences, targetProteinPerDay } = args
-  const selectedSet = new Set(selectedRecipes.flatMap((recipe) => recipe.ingredientKeys))
-  const currentProtein = lunch.proteinPerServing + dinner.proteinPerServing
-  const proteinDelta = Math.abs(targetProteinPerDay - currentProtein)
-  const reuseScore =
-    lunch.ingredientKeys.filter((ingredient) => selectedSet.has(ingredient)).length * 5 +
-    dinner.ingredientKeys.filter((ingredient) => selectedSet.has(ingredient)).length * 5 +
-    overlapScore(lunch, dinner)
-
-  const repeatPenalty =
-    (counts.get(lunch.id) ?? 0) * 18 +
-    (counts.get(dinner.id) ?? 0) * 18 +
-    (previousPair?.[0].id === lunch.id ? 14 : 0) +
-    (previousPair?.[1].id === dinner.id ? 14 : 0)
-
-  const diversityPenalty = previousPair && previousPair[0].id === lunch.id && previousPair[1].id === dinner.id ? 25 : 0
-
-  return (
-    scoreRecipe(lunch, preferences) +
-    scoreRecipe(dinner, preferences) +
-    reuseScore -
-    repeatPenalty -
-    diversityPenalty -
-    proteinDelta
-  )
-}
-
-function buildRecipePoolScore(recipes: NormalizedRecipe[], preferences: string[], targetProteinPerDay: number): number {
+function buildRecipePoolScore(recipes: NormalizedRecipe[], preferences: string[]): number {
   const recipeScore = recipes.reduce((total, recipe) => total + scoreRecipe(recipe, preferences), 0)
   const reuseScore = recipes.reduce((total, recipe, index) => {
     const overlapTotal = recipes
@@ -258,32 +220,22 @@ function buildRecipePoolScore(recipes: NormalizedRecipe[], preferences: string[]
 
     return total + overlapTotal
   }, 0)
-  const proteinDeltas = recipes.reduce((total, recipe, index) => {
-    const pairProteinDelta = recipes
-      .slice(index + 1)
-      .reduce((pairTotal, otherRecipe) => {
-        return pairTotal + Math.abs(targetProteinPerDay - (recipe.proteinPerServing + otherRecipe.proteinPerServing))
-      }, 0)
 
-    return total + pairProteinDelta
-  }, 0)
-
-  return recipeScore + reuseScore - proteinDeltas
+  return recipeScore + reuseScore
 }
 
 function selectRecipePool(args: {
   recipes: NormalizedRecipe[]
   recipeCount: number
   preferences: string[]
-  targetProteinPerDay: number
 }): NormalizedRecipe[] {
-  const { recipes, recipeCount, preferences, targetProteinPerDay } = args
+  const { recipes, recipeCount, preferences } = args
   let bestPool: NormalizedRecipe[] | undefined
   let bestScore = Number.NEGATIVE_INFINITY
 
   function visit(startIndex: number, pool: NormalizedRecipe[]) {
     if (pool.length === recipeCount) {
-      const poolScore = buildRecipePoolScore(pool, preferences, targetProteinPerDay)
+      const poolScore = buildRecipePoolScore(pool, preferences)
       const bestPoolKey = bestPool?.map((recipe) => recipe.title).join('|') ?? ''
       const currentPoolKey = pool.map((recipe) => recipe.title).join('|')
 
@@ -311,8 +263,87 @@ function selectRecipePool(args: {
   return bestPool
 }
 
+function buildMealAssignments(recipePool: NormalizedRecipe[], dayCount: number): GeneratedPlan['days'] {
+  return Array.from({ length: dayCount }, (_, index) => {
+    const lunch = recipePool[index % recipePool.length]!
+    const dinner = recipePool[(index + 1) % recipePool.length]!
+    const lunchNutrition = getRecipeNutrition(lunch)
+    const dinnerNutrition = getRecipeNutrition(dinner)
+
+    return {
+      day: index + 1,
+      meals: [
+        {
+          type: 'lunch',
+          recipeId: lunch.id,
+          recipeTitle: lunch.title,
+          nutrition: lunchNutrition,
+        },
+        {
+          type: 'dinner',
+          recipeId: dinner.id,
+          recipeTitle: dinner.title,
+          nutrition: dinnerNutrition,
+        },
+      ],
+      nutrition: addNutrition(lunchNutrition, dinnerNutrition),
+    }
+  })
+}
+
 function getBatchCount(recipe: NormalizedRecipe, people: number): number {
   return Math.max(1, Math.ceil(people / Math.max(1, recipe.servings)))
+}
+
+function parseNumericAmount(value: string): number | undefined {
+  const trimmed = value.trim()
+
+  if (/^\d+\/\d+$/.test(trimmed)) {
+    const [numerator, denominator] = trimmed.split('/').map(Number)
+    if (!denominator) {
+      return undefined
+    }
+
+    return numerator / denominator
+  }
+
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function formatNumericAmount(value: number): string {
+  if (Number.isInteger(value)) {
+    return String(value)
+  }
+
+  return value.toFixed(2).replace(/\.?0+$/, '')
+}
+
+function multiplyQuantity(quantity: string, count: number): string {
+  const match = quantity.match(/^(\d+(?:\.\d+)?|\d+\s+\d+\/\d+|\d+\/\d+)(.*)$/)
+  if (!match) {
+    return count > 1 ? `${quantity} x${count}` : quantity
+  }
+
+  const [, rawAmount, remainder] = match
+  const normalizedAmount = rawAmount.includes(' ')
+    ? rawAmount
+        .split(/\s+/)
+        .map((part) => parseNumericAmount(part))
+        .reduce<number | undefined>((total, part) => {
+          if (part === undefined) {
+            return undefined
+          }
+
+          return (total ?? 0) + part
+        }, undefined)
+    : parseNumericAmount(rawAmount)
+
+  if (normalizedAmount === undefined) {
+    return count > 1 ? `${quantity} x${count}` : quantity
+  }
+
+  return `${formatNumericAmount(normalizedAmount * count)}${remainder}`
 }
 
 function summarizeQuantities(quantities: string[]): string | undefined {
@@ -328,7 +359,7 @@ function summarizeQuantities(quantities: string[]): string | undefined {
 
   return Array.from(counts.entries())
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([quantity, count]) => (count > 1 ? `${quantity} x${count}` : quantity))
+    .map(([quantity, count]) => multiplyQuantity(quantity, count))
     .join(' + ')
 }
 
@@ -448,7 +479,6 @@ export function generateMealPlan(
   const people = Math.max(1, options.people ?? 1)
   const preferences = (options.preferences ?? []).map(normalizeText).filter(Boolean)
   const exclusions = (options.exclusions ?? []).map(normalizeText).filter(Boolean)
-  const targetProteinPerDay = Math.max(0, options.targetProteinPerDay ?? DEFAULT_TARGET_PROTEIN_PER_DAY)
   const recipeCount = getRecipeCount(dayCount, options.recipeCount)
 
   const normalizedRecipes = recipes
@@ -475,77 +505,11 @@ export function generateMealPlan(
     recipes: normalizedRecipes,
     recipeCount,
     preferences,
-    targetProteinPerDay,
   })
-
-  const counts = new Map<string, number>()
-  const selectedRecipes: NormalizedRecipe[] = []
-  const days: GeneratedPlan['days'] = []
-  let previousPair: [NormalizedRecipe, NormalizedRecipe] | undefined
-
-  for (let day = 1; day <= dayCount; day += 1) {
-    let bestPair: [NormalizedRecipe, NormalizedRecipe] | undefined
-    let bestScore = Number.NEGATIVE_INFINITY
-
-    recipePool.forEach((lunch) => {
-      recipePool.forEach((dinner) => {
-        if (lunch.id === dinner.id) {
-          return
-        }
-
-        const pairScore = buildDailyPairScore({
-          counts,
-          previousPair,
-          selectedRecipes,
-          lunch,
-          dinner,
-          preferences,
-          targetProteinPerDay,
-        })
-
-        const bestPairKey = bestPair ? `${bestPair[0].title}|${bestPair[1].title}` : ''
-        const currentPairKey = `${lunch.title}|${dinner.title}`
-
-        if (pairScore > bestScore || (pairScore === bestScore && currentPairKey < bestPairKey)) {
-          bestScore = pairScore
-          bestPair = [lunch, dinner]
-        }
-      })
-    })
-
-    if (!bestPair) {
-      throw new Error('Unable to build a meal plan from the current recipe catalog.')
-    }
-
-    const [lunch, dinner] = bestPair
-    const lunchNutrition = getRecipeNutrition(lunch)
-    const dinnerNutrition = getRecipeNutrition(dinner)
-    const dayNutrition = addNutrition(lunchNutrition, dinnerNutrition)
-
-    counts.set(lunch.id, (counts.get(lunch.id) ?? 0) + 1)
-    counts.set(dinner.id, (counts.get(dinner.id) ?? 0) + 1)
-    selectedRecipes.push(lunch, dinner)
-    previousPair = bestPair
-
-    days.push({
-      day,
-      meals: [
-        {
-          type: 'lunch',
-          recipeId: lunch.id,
-          recipeTitle: lunch.title,
-          nutrition: lunchNutrition,
-        },
-        {
-          type: 'dinner',
-          recipeId: dinner.id,
-          recipeTitle: dinner.title,
-          nutrition: dinnerNutrition,
-        },
-      ],
-      nutrition: dayNutrition,
-    })
-  }
+  const days = buildMealAssignments(recipePool, dayCount)
+  const selectedRecipes = days.flatMap((day) =>
+    day.meals.map((meal) => recipePool.find((recipe) => recipe.id === meal.recipeId)!),
+  )
 
   const totalNutrition = days.reduce<NutritionTotals>(
     (totals, day) => addNutrition(totals, day.nutrition),

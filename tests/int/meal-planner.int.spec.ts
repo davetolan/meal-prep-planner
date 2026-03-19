@@ -59,7 +59,6 @@ describe('generateMealPlan', () => {
   it('creates a deterministic 3-5 day plan with lunch and dinner meals', () => {
     const plan = generateMealPlan(recipes, {
       days: 4,
-      targetProteinPerDay: 75,
     })
 
     expect(plan.days).toHaveLength(4)
@@ -69,6 +68,12 @@ describe('generateMealPlan', () => {
       expect(day.nutrition.calories).toBeGreaterThan(0)
       expect(day.nutrition.protein).toBeGreaterThan(0)
     })
+    expect(plan.days.map((day) => day.meals.map((meal) => meal.recipeId))).toEqual([
+      ['chicken-rice', 'turkey-rice'],
+      ['turkey-rice', 'chicken-rice'],
+      ['chicken-rice', 'turkey-rice'],
+      ['turkey-rice', 'chicken-rice'],
+    ])
     expect(plan.prepSteps.length).toBeGreaterThan(1)
     expect(plan.groceryList.some((item) => item.ingredient === 'rice')).toBe(true)
     expect(plan.nutritionSummary.averagePerDay.calories).toBeGreaterThan(0)
@@ -88,14 +93,25 @@ describe('generateMealPlan', () => {
     const firstPlan = generateMealPlan(recipes, {
       days: 5,
       exclusions: ['marinara'],
-      targetProteinPerDay: 70,
+      recipeCount: 2,
     })
     const secondPlan = generateMealPlan(recipes, {
       days: 5,
       exclusions: ['marinara'],
-      targetProteinPerDay: 70,
+      recipeCount: 2,
     })
 
     expect(secondPlan).toEqual(firstPlan)
+  })
+
+  it('multiplies repeated grocery quantities into a single total', () => {
+    const plan = generateMealPlan(recipes, {
+      days: 4,
+      exclusions: ['beef'],
+    })
+
+    const rice = plan.groceryList.find((item) => item.ingredient === 'rice')
+    expect(rice?.quantity).toBe('16 cups')
+    expect(rice?.quantity).not.toContain('x')
   })
 })
