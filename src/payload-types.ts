@@ -791,10 +791,15 @@ export interface Form {
  */
 export interface Recipe {
   id: number;
+  sourceId: string;
   name: string;
+  description?: string | null;
+  servings?: number | null;
   ingredients?:
     | {
-        ingredient: string;
+        name: string;
+        quantity?: string | null;
+        category?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -808,7 +813,35 @@ export interface Recipe {
    * Prep time in minutes.
    */
   prepTime?: number | null;
+  /**
+   * Cook time in minutes.
+   */
+  cookTime?: number | null;
   batchable?: boolean | null;
+  instructions?:
+    | {
+        step: string;
+        id?: string | null;
+      }[]
+    | null;
+  storage?: {
+    fridgeDays?: number | null;
+    freezerDays?: number | null;
+    reheatInstructions?: string | null;
+  };
+  batchNotes?:
+    | {
+        note: string;
+        id?: string | null;
+      }[]
+    | null;
+  mealVariations?:
+    | {
+        variation: string;
+        id?: string | null;
+      }[]
+    | null;
+  estimatedProteinPerServing?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1413,11 +1446,16 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "recipes_select".
  */
 export interface RecipesSelect<T extends boolean = true> {
+  sourceId?: T;
   name?: T;
+  description?: T;
+  servings?: T;
   ingredients?:
     | T
     | {
-        ingredient?: T;
+        name?: T;
+        quantity?: T;
+        category?: T;
         id?: T;
       };
   tags?:
@@ -1427,7 +1465,34 @@ export interface RecipesSelect<T extends boolean = true> {
         id?: T;
       };
   prepTime?: T;
+  cookTime?: T;
   batchable?: T;
+  instructions?:
+    | T
+    | {
+        step?: T;
+        id?: T;
+      };
+  storage?:
+    | T
+    | {
+        fridgeDays?: T;
+        freezerDays?: T;
+        reheatInstructions?: T;
+      };
+  batchNotes?:
+    | T
+    | {
+        note?: T;
+        id?: T;
+      };
+  mealVariations?:
+    | T
+    | {
+        variation?: T;
+        id?: T;
+      };
+  estimatedProteinPerServing?: T;
   updatedAt?: T;
   createdAt?: T;
 }

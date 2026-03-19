@@ -12,23 +12,53 @@ export const Recipes: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['name', 'prepTime', 'batchable', 'updatedAt'],
+    defaultColumns: [
+      'name',
+      'sourceId',
+      'prepTime',
+      'estimatedProteinPerServing',
+      'batchable',
+      'updatedAt',
+    ],
     useAsTitle: 'name',
   },
   fields: [
+    {
+      name: 'sourceId',
+      type: 'text',
+      index: true,
+      required: true,
+    },
     {
       name: 'name',
       type: 'text',
       required: true,
     },
     {
+      name: 'description',
+      type: 'textarea',
+    },
+    {
+      name: 'servings',
+      type: 'number',
+      min: 1,
+    },
+    {
       name: 'ingredients',
       type: 'array',
       fields: [
         {
-          name: 'ingredient',
+          name: 'name',
           type: 'text',
           required: true,
+        },
+        {
+          name: 'quantity',
+          type: 'text',
+        },
+        {
+          name: 'category',
+          type: 'text',
         },
       ],
     },
@@ -52,9 +82,75 @@ export const Recipes: CollectionConfig = {
       },
     },
     {
+      name: 'cookTime',
+      type: 'number',
+      min: 0,
+      admin: {
+        description: 'Cook time in minutes.',
+      },
+    },
+    {
       name: 'batchable',
       type: 'checkbox',
       defaultValue: false,
+    },
+    {
+      name: 'instructions',
+      type: 'array',
+      fields: [
+        {
+          name: 'step',
+          type: 'textarea',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'storage',
+      type: 'group',
+      fields: [
+        {
+          name: 'fridgeDays',
+          type: 'number',
+          min: 0,
+        },
+        {
+          name: 'freezerDays',
+          type: 'number',
+          min: 0,
+        },
+        {
+          name: 'reheatInstructions',
+          type: 'textarea',
+        },
+      ],
+    },
+    {
+      name: 'batchNotes',
+      type: 'array',
+      fields: [
+        {
+          name: 'note',
+          type: 'textarea',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'mealVariations',
+      type: 'array',
+      fields: [
+        {
+          name: 'variation',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'estimatedProteinPerServing',
+      type: 'number',
+      min: 0,
     },
   ],
   timestamps: true,

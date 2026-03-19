@@ -24,10 +24,18 @@ export type PlannerIngredient = {
 export type PlannerRecipeInput = {
   id: string
   title: string
+  description?: string
+  servings?: number
   ingredients: PlannerIngredient[]
   instructions?: string[]
+  storage?: {
+    fridge_days?: number
+    freezer_days?: number
+    reheat_instructions?: string
+  }
   batch_notes?: string[]
   tags?: string[]
+  meal_variations?: string[]
   prep_time_minutes?: number
   cook_time_minutes?: number
   estimated_protein_per_serving?: number
@@ -35,8 +43,23 @@ export type PlannerRecipeInput = {
 
 export type GenerateMealPlanOptions = {
   days?: number
+  people?: number
+  preferences?: string[]
   exclusions?: string[]
   targetProteinPerDay?: number
+}
+
+export type MealPlanGenerateRequest = {
+  days?: number
+  people?: number
+  preferences?: string[]
+  excludedIngredients?: string[]
+}
+
+export type MealPlanGenerateResponse = {
+  selectedMeals: GeneratedPlan['days']
+  groceryList: GeneratedPlan['groceryList']
+  prepPlan: string[]
 }
 
 type NormalizedRecipe = {
@@ -49,6 +72,7 @@ type NormalizedRecipe = {
   tags: string[]
   prepTimeMinutes: number
   cookTimeMinutes: number
+  servings: number
   proteinPerServing: number
   batchable: boolean
   hasProtein: boolean
@@ -103,6 +127,7 @@ function normalizeRecipe(recipe: PlannerRecipeInput): NormalizedRecipe {
     tags,
     prepTimeMinutes: recipe.prep_time_minutes ?? 0,
     cookTimeMinutes: recipe.cook_time_minutes ?? 0,
+    servings: recipe.servings ?? 1,
     proteinPerServing: recipe.estimated_protein_per_serving ?? 0,
     batchable,
     hasProtein: categories.includes('protein'),
@@ -124,12 +149,21 @@ function matchesExclusions(recipe: NormalizedRecipe, exclusions: string[]): bool
   return exclusions.some((exclusion) => haystack.includes(exclusion))
 }
 
-function scoreRecipe(recipe: NormalizedRecipe): number {
+function scoreRecipe(recipe: NormalizedRecipe, preferences: string[]): number {
+  const preferenceScore = preferences.reduce((score, preference) => {
+    if (recipe.tags.includes(preference) || normalizeText(recipe.title).includes(preference)) {
+      return score + 20
+    }
+
+    return score
+  }, 0)
+
   return (
     recipe.proteinPerServing * 2 +
     (recipe.batchable ? 25 : 0) +
     (recipe.hasProtein ? 15 : 0) +
-    (recipe.hasCarb ? 12 : 0)
+    (recipe.hasCarb ? 12 : 0) +
+    preferenceScore
   )
 }
 
@@ -144,9 +178,10 @@ function buildDailyPairScore(args: {
   selectedRecipes: NormalizedRecipe[]
   lunch: NormalizedRecipe
   dinner: NormalizedRecipe
+  preferences: string[]
   targetProteinPerDay: number
 }): number {
-  const { counts, previousPair, selectedRecipes, lunch, dinner, targetProteinPerDay } = args
+  const { counts, previousPair, selectedRecipes, lunch, dinner, preferences, targetProteinPerDay } = args
   const selectedSet = new Set(selectedRecipes.flatMap((recipe) => recipe.ingredientKeys))
   const currentProtein = lunch.proteinPerServing + dinner.proteinPerServing
   const proteinDelta = Math.abs(targetProteinPerDay - currentProtein)
@@ -164,13 +199,17 @@ function buildDailyPairScore(args: {
   const diversityPenalty = previousPair && previousPair[0].id === lunch.id && previousPair[1].id === dinner.id ? 25 : 0
 
   return (
-    scoreRecipe(lunch) +
-    scoreRecipe(dinner) +
+    scoreRecipe(lunch, preferences) +
+    scoreRecipe(dinner, preferences) +
     reuseScore -
     repeatPenalty -
     diversityPenalty -
     proteinDelta
   )
+}
+
+function getBatchCount(recipe: NormalizedRecipe, people: number): number {
+  return Math.max(1, Math.ceil(people / Math.max(1, recipe.servings)))
 }
 
 function summarizeQuantities(quantities: string[]): string | undefined {
@@ -190,23 +229,24 @@ function summarizeQuantities(quantities: string[]): string | undefined {
     .join(' + ')
 }
 
-function buildGroceryList(selectedMeals: NormalizedRecipe[]): GeneratedPlan['groceryList'] {
+function buildGroceryList(selectedMeals: NormalizedRecipe[], people: number): GeneratedPlan['groceryList'] {
   const aggregates = selectedMeals.reduce<Map<string, GroceryAggregate>>((map, recipe) => {
+    const batchCount = getBatchCount(recipe, people)
+
     recipe.ingredients.forEach((ingredient) => {
       const key = normalizeText(ingredient.name)
       const existing = map.get(key)
+      const repeatedQuantities = ingredient.quantity ? Array.from({ length: batchCount }, () => ingredient.quantity as string) : []
 
       if (existing) {
-        if (ingredient.quantity) {
-          existing.quantities.push(ingredient.quantity)
-        }
+        existing.quantities.push(...repeatedQuantities)
         return
       }
 
       map.set(key, {
         ingredient: ingredient.name,
         category: ingredient.category,
-        quantities: ingredient.quantity ? [ingredient.quantity] : [],
+        quantities: repeatedQuantities,
       })
     })
 
@@ -229,9 +269,9 @@ function buildGroceryList(selectedMeals: NormalizedRecipe[]): GeneratedPlan['gro
     })
 }
 
-function buildPrepSteps(selectedMeals: NormalizedRecipe[]): string[] {
+function buildPrepSteps(selectedMeals: NormalizedRecipe[], people: number): string[] {
   const frequency = selectedMeals.reduce<Map<string, number>>((map, recipe) => {
-    map.set(recipe.id, (map.get(recipe.id) ?? 0) + 1)
+    map.set(recipe.id, (map.get(recipe.id) ?? 0) + getBatchCount(recipe, people))
     return map
   }, new Map())
 
@@ -257,7 +297,7 @@ function buildPrepSteps(selectedMeals: NormalizedRecipe[]): string[] {
   uniqueRecipes.forEach((recipe) => {
     const note = recipe.batchNotes[0] ?? recipe.instructions[0]
     if (note) {
-      prepSteps.push(`${recipe.title}: ${note}`)
+      prepSteps.push(`${recipe.title} (${frequency.get(recipe.id) ?? 1} batch${(frequency.get(recipe.id) ?? 1) === 1 ? '' : 'es'}): ${note}`)
     }
   })
 
@@ -271,6 +311,8 @@ export function generateMealPlan(
   options: GenerateMealPlanOptions = {},
 ): GeneratedPlan {
   const dayCount = Math.min(MAX_DAYS, Math.max(MIN_DAYS, options.days ?? DEFAULT_DAYS))
+  const people = Math.max(1, options.people ?? 1)
+  const preferences = (options.preferences ?? []).map(normalizeText).filter(Boolean)
   const exclusions = (options.exclusions ?? []).map(normalizeText).filter(Boolean)
   const targetProteinPerDay = Math.max(0, options.targetProteinPerDay ?? DEFAULT_TARGET_PROTEIN_PER_DAY)
 
@@ -278,7 +320,7 @@ export function generateMealPlan(
     .map(normalizeRecipe)
     .filter((recipe) => !matchesExclusions(recipe, exclusions))
     .sort((left, right) => {
-      const scoreDelta = scoreRecipe(right) - scoreRecipe(left)
+      const scoreDelta = scoreRecipe(right, preferences) - scoreRecipe(left, preferences)
       if (scoreDelta !== 0) {
         return scoreDelta
       }
@@ -311,6 +353,7 @@ export function generateMealPlan(
           selectedRecipes,
           lunch,
           dinner,
+          preferences,
           targetProteinPerDay,
         })
 
@@ -354,7 +397,7 @@ export function generateMealPlan(
 
   return {
     days,
-    groceryList: buildGroceryList(selectedRecipes),
-    prepSteps: buildPrepSteps(selectedRecipes),
+    groceryList: buildGroceryList(selectedRecipes, people),
+    prepSteps: buildPrepSteps(selectedRecipes, people),
   }
 }
