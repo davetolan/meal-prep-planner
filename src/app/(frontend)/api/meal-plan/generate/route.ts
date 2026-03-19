@@ -24,6 +24,7 @@ export async function POST(request: Request): Promise<Response> {
       selectedMeals: plan.days,
       groceryList: plan.groceryList,
       prepPlan: plan.prepSteps,
+      nutritionSummary: plan.nutritionSummary,
     }
 
     return Response.json(response)

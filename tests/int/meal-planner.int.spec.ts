@@ -8,7 +8,10 @@ const recipes: PlannerRecipeInput[] = [
     title: 'Chicken Rice Bowls',
     tags: ['high-protein', 'batch-cooking'],
     prep_time_minutes: 20,
-    estimated_protein_per_serving: 42,
+    calories_per_serving: 510,
+    protein_per_serving: 42,
+    carbs_per_serving: 40,
+    fat_per_serving: 14,
     ingredients: [
       { name: 'chicken breast', quantity: '2 lb', category: 'protein' },
       { name: 'rice', quantity: '2 cups', category: 'carb' },
@@ -22,7 +25,10 @@ const recipes: PlannerRecipeInput[] = [
     title: 'Turkey Rice Skillet',
     tags: ['high-protein', 'batch-cooking'],
     prep_time_minutes: 15,
-    estimated_protein_per_serving: 35,
+    calories_per_serving: 430,
+    protein_per_serving: 35,
+    carbs_per_serving: 34,
+    fat_per_serving: 15,
     ingredients: [
       { name: 'ground turkey', quantity: '2 lb', category: 'protein' },
       { name: 'rice', quantity: '2 cups', category: 'carb' },
@@ -36,7 +42,10 @@ const recipes: PlannerRecipeInput[] = [
     title: 'Beef Pasta',
     tags: ['high-protein'],
     prep_time_minutes: 25,
-    estimated_protein_per_serving: 28,
+    calories_per_serving: 540,
+    protein_per_serving: 28,
+    carbs_per_serving: 48,
+    fat_per_serving: 21,
     ingredients: [
       { name: 'ground beef', quantity: '2 lb', category: 'protein' },
       { name: 'pasta', quantity: '1 lb', category: 'carb' },
@@ -57,9 +66,12 @@ describe('generateMealPlan', () => {
     plan.days.forEach((day, index) => {
       expect(day.day).toBe(index + 1)
       expect(day.meals.map((meal) => meal.type)).toEqual(['lunch', 'dinner'])
+      expect(day.nutrition.calories).toBeGreaterThan(0)
+      expect(day.nutrition.protein).toBeGreaterThan(0)
     })
     expect(plan.prepSteps.length).toBeGreaterThan(1)
     expect(plan.groceryList.some((item) => item.ingredient === 'rice')).toBe(true)
+    expect(plan.nutritionSummary.averagePerDay.calories).toBeGreaterThan(0)
   })
 
   it('respects exclusions', () => {

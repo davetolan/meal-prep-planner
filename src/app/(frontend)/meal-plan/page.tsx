@@ -24,6 +24,9 @@ export default function MealPlanPage() {
             name="days"
             type="number"
           />
+          <p className="text-sm text-muted-foreground">
+            Plans currently reuse 2-3 core recipes to keep prep simple and batch-friendly.
+          </p>
         </div>
 
         <div className="space-y-2">

@@ -28,7 +28,10 @@ function mapRecipeToPlannerInput(recipe: Recipe): PlannerRecipeInput {
     meal_variations: (recipe.mealVariations ?? []).map((variation) => variation.variation),
     prep_time_minutes: recipe.prepTime ?? undefined,
     cook_time_minutes: recipe.cookTime ?? undefined,
-    estimated_protein_per_serving: recipe.estimatedProteinPerServing ?? undefined,
+    calories_per_serving: recipe.caloriesPerServing ?? undefined,
+    protein_per_serving: recipe.proteinPerServing ?? undefined,
+    carbs_per_serving: recipe.carbsPerServing ?? undefined,
+    fat_per_serving: recipe.fatPerServing ?? undefined,
   }
 }
 

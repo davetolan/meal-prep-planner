@@ -841,7 +841,10 @@ export interface Recipe {
         id?: string | null;
       }[]
     | null;
-  estimatedProteinPerServing?: number | null;
+  caloriesPerServing: number;
+  proteinPerServing: number;
+  carbsPerServing?: number | null;
+  fatPerServing?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1492,7 +1495,10 @@ export interface RecipesSelect<T extends boolean = true> {
         variation?: T;
         id?: T;
       };
-  estimatedProteinPerServing?: T;
+  caloriesPerServing?: T;
+  proteinPerServing?: T;
+  carbsPerServing?: T;
+  fatPerServing?: T;
   updatedAt?: T;
   createdAt?: T;
 }

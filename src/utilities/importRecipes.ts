@@ -42,7 +42,10 @@ function buildRecipeData(recipe: Awaited<ReturnType<typeof loadRecipeCatalog>>[n
       : undefined,
     batchNotes: (recipe.batch_notes ?? []).map((note) => ({ note })),
     mealVariations: (recipe.meal_variations ?? []).map((variation) => ({ variation })),
-    estimatedProteinPerServing: recipe.estimated_protein_per_serving,
+    caloriesPerServing: recipe.calories_per_serving,
+    proteinPerServing: recipe.protein_per_serving,
+    carbsPerServing: recipe.carbs_per_serving,
+    fatPerServing: recipe.fat_per_serving,
   }
 }
 
