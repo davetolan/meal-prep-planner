@@ -1,0 +1,228 @@
+[
+  {
+    "title": "Bulk Baked Chicken Thighs and Roasted Vegetables",
+    "description": "Oven-baked chicken thighs with roasted vegetables, ideal for batch cooking and flexible meal reuse.",
+    "servings": 8,
+    "prep_time_minutes": 15,
+    "cook_time_minutes": 50,
+    "ingredients": [
+      { "name": "chicken thighs", "quantity": "4 lbs", "category": "protein" },
+      { "name": "potatoes", "quantity": "3 lbs, diced", "category": "carb" },
+      { "name": "carrots", "quantity": "1 lb, sliced", "category": "vegetable" },
+      { "name": "onion", "quantity": "2 large, sliced", "category": "vegetable" },
+      { "name": "olive oil", "quantity": "3 tbsp", "category": "pantry" },
+      { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+      { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+      { "name": "garlic powder", "quantity": "2 tsp", "category": "pantry" }
+    ],
+    "instructions": [
+      "Preheat oven to 400°F.",
+      "Toss potatoes, carrots, and onions with olive oil and half the seasoning.",
+      "Spread vegetables on a large baking sheet.",
+      "Season chicken with remaining spices and place on top of vegetables.",
+      "Bake for 45–50 minutes until chicken is cooked through.",
+      "Let cool slightly and portion into containers."
+    ],
+    "storage": {
+      "fridge_days": 4,
+      "freezer_days": 60,
+      "reheat_instructions": "Reheat in oven at 350°F or microwave until warmed through."
+    },
+    "batch_notes": [
+      "Roast everything on one sheet pan for efficiency.",
+      "Chicken and vegetables can be stored together or separately."
+    ],
+    "meal_variations": [
+      "Serve as-is for dinner plates",
+      "Chop chicken for wraps",
+      "Add to rice bowls",
+      "Use in simple soups"
+    ],
+    "tags": ["high-protein", "budget", "kid-friendly", "batch-cooking"],
+    "calories_per_serving": 460,
+    "protein_per_serving": 35,
+    "carbs_per_serving": 28,
+    "fat_per_serving": 22
+  },
+  {
+    "title": "Bulk Turkey and Rice Skillet",
+    "description": "Lean ground turkey cooked with rice and vegetables, perfect for meal prep and multiple meal variations.",
+    "servings": 8,
+    "prep_time_minutes": 15,
+    "cook_time_minutes": 40,
+    "ingredients": [
+      { "name": "ground turkey", "quantity": "3 lbs", "category": "protein" },
+      { "name": "white rice", "quantity": "3 cups dry", "category": "carb" },
+      { "name": "onion", "quantity": "2 medium, diced", "category": "vegetable" },
+      { "name": "bell peppers", "quantity": "2, diced", "category": "vegetable" },
+      { "name": "garlic", "quantity": "3 cloves, minced", "category": "vegetable" },
+      { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+      { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+      { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" }
+    ],
+    "instructions": [
+      "Cook rice according to package instructions.",
+      "Heat oil in a large skillet and sauté onion and peppers.",
+      "Add garlic and cook briefly.",
+      "Add ground turkey and cook until browned.",
+      "Season with salt and pepper.",
+      "Mix in cooked rice and stir well.",
+      "Portion into containers."
+    ],
+    "storage": {
+      "fridge_days": 4,
+      "freezer_days": 90,
+      "reheat_instructions": "Microwave with a splash of water or heat in skillet until warmed."
+    },
+    "batch_notes": [
+      "Cook rice and turkey in parallel to save time.",
+      "This base can be portioned for multiple meals."
+    ],
+    "meal_variations": [
+      "Turkey rice bowls",
+      "Stuffed peppers",
+      "Wrap filling",
+      "Quick fried rice"
+    ],
+    "tags": ["high-protein", "budget", "kid-friendly", "batch-cooking"],
+    "calories_per_serving": 430,
+    "protein_per_serving": 34,
+    "carbs_per_serving": 35,
+    "fat_per_serving": 15
+  },
+  {
+    "title": "Bulk Pasta with Meat Sauce",
+    "description": "Classic pasta with hearty meat sauce, ideal for large-batch cooking and freezer-friendly storage.",
+    "servings": 8,
+    "prep_time_minutes": 15,
+    "cook_time_minutes": 45,
+    "ingredients": [
+      { "name": "ground beef", "quantity": "2 lbs", "category": "protein" },
+      { "name": "pasta", "quantity": "2 lbs", "category": "carb" },
+      { "name": "onion", "quantity": "1 large, diced", "category": "vegetable" },
+      { "name": "garlic", "quantity": "3 cloves, minced", "category": "vegetable" },
+      { "name": "marinara sauce", "quantity": "2 jars", "category": "pantry" },
+      { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+      { "name": "salt", "quantity": "to taste", "category": "pantry" }
+    ],
+    "instructions": [
+      "Cook pasta according to package instructions.",
+      "Heat oil and sauté onion until soft.",
+      "Add garlic and cook briefly.",
+      "Add ground beef and cook until browned.",
+      "Stir in marinara sauce and simmer 15 minutes.",
+      "Combine pasta with sauce or keep separate.",
+      "Portion into containers."
+    ],
+    "storage": {
+      "fridge_days": 4,
+      "freezer_days": 60,
+      "reheat_instructions": "Microwave or reheat on stove with a splash of water."
+    },
+    "batch_notes": [
+      "Make sauce in bulk and pair with fresh pasta as needed.",
+      "Freeze portions for later use."
+    ],
+    "meal_variations": [
+      "Classic pasta bowls",
+      "Baked pasta casserole",
+      "Stuffed pasta shells",
+      "Meat sauce over rice"
+    ],
+    "tags": ["high-protein", "budget", "kid-friendly", "batch-cooking"],
+    "calories_per_serving": 500,
+    "protein_per_serving": 28,
+    "carbs_per_serving": 48,
+    "fat_per_serving": 20
+  },
+  {
+    "title": "Bulk Egg and Potato Breakfast Hash",
+    "description": "Simple breakfast hash with eggs and potatoes, suitable for batch cooking and reheating.",
+    "servings": 8,
+    "prep_time_minutes": 15,
+    "cook_time_minutes": 35,
+    "ingredients": [
+      { "name": "eggs", "quantity": "16 large", "category": "protein" },
+      { "name": "potatoes", "quantity": "3 lbs, diced", "category": "carb" },
+      { "name": "onion", "quantity": "1 large, diced", "category": "vegetable" },
+      { "name": "bell peppers", "quantity": "2, diced", "category": "vegetable" },
+      { "name": "olive oil", "quantity": "2 tbsp", "category": "pantry" },
+      { "name": "salt", "quantity": "1.5 tsp", "category": "pantry" },
+      { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" }
+    ],
+    "instructions": [
+      "Heat oil in a large skillet.",
+      "Cook potatoes until tender and slightly crispy.",
+      "Add onion and peppers, cook until softened.",
+      "Whisk eggs and pour into skillet.",
+      "Stir until eggs are cooked through.",
+      "Season and portion into containers."
+    ],
+    "storage": {
+      "fridge_days": 4,
+      "freezer_days": 30,
+      "reheat_instructions": "Microwave in short intervals, stirring occasionally."
+    },
+    "batch_notes": [
+      "Cook potatoes first to ensure proper texture.",
+      "Eggs can be added at the end to avoid overcooking."
+    ],
+    "meal_variations": [
+      "Breakfast burritos",
+      "Breakfast bowls",
+      "Side for dinner",
+      "Wrap filling"
+    ],
+    "tags": ["high-protein", "budget", "kid-friendly", "batch-cooking"],
+    "calories_per_serving": 320,
+    "protein_per_serving": 20,
+    "carbs_per_serving": 24,
+    "fat_per_serving": 16
+  },
+  {
+    "title": "Bulk Lentil and Vegetable Stew",
+    "description": "A budget-friendly, protein-rich lentil stew that stores well and can be used across multiple meals.",
+    "servings": 8,
+    "prep_time_minutes": 15,
+    "cook_time_minutes": 50,
+    "ingredients": [
+      { "name": "dry lentils", "quantity": "2 cups", "category": "protein" },
+      { "name": "carrots", "quantity": "3, chopped", "category": "vegetable" },
+      { "name": "onion", "quantity": "1 large, diced", "category": "vegetable" },
+      { "name": "celery", "quantity": "2 stalks, chopped", "category": "vegetable" },
+      { "name": "garlic", "quantity": "3 cloves", "category": "vegetable" },
+      { "name": "diced tomatoes", "quantity": "1 can", "category": "pantry" },
+      { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+      { "name": "salt", "quantity": "1.5 tsp", "category": "pantry" },
+      { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" }
+    ],
+    "instructions": [
+      "Heat oil in a large pot.",
+      "Add onion, carrots, and celery, cook until softened.",
+      "Add garlic and cook briefly.",
+      "Add lentils, tomatoes, and water.",
+      "Simmer for 40–50 minutes until lentils are tender.",
+      "Season and portion into containers."
+    ],
+    "storage": {
+      "fridge_days": 5,
+      "freezer_days": 90,
+      "reheat_instructions": "Reheat on stove or microwave, adding water if needed."
+    },
+    "batch_notes": [
+      "Cook a large pot and divide into portions.",
+      "Freezes very well for long-term storage."
+    ],
+    "meal_variations": [
+      "Serve as soup",
+      "Use as side dish",
+      "Add over rice",
+      "Stuff into wraps"
+    ],
+    "tags": ["high-protein", "budget", "kid-friendly", "batch-cooking"],
+    "calories_per_serving": 280,
+    "protein_per_serving": 18,
+    "carbs_per_serving": 38,
+    "fat_per_serving": 6
+  }
+]

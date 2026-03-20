@@ -1,0 +1,53 @@
+{
+  "title": "Bulk Slow Cooker Shredded Chicken Base",
+  "description": "Tender shredded chicken cooked in a slow cooker, ideal for batch prep and reuse in sandwiches, wraps, bowls, and casseroles.",
+  "servings": 8,
+  "prep_time_minutes": 10,
+  "cook_time_minutes": 360,
+  "ingredients": [
+    { "name": "chicken thighs or breasts", "quantity": "4 lbs", "category": "protein" },
+    { "name": "chicken broth", "quantity": "2 cups", "category": "pantry" },
+    { "name": "onion", "quantity": "1 large, sliced", "category": "vegetable" },
+    { "name": "garlic", "quantity": "4 cloves, minced", "category": "vegetable" },
+    { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+    { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "paprika", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "dried oregano", "quantity": "1 tsp", "category": "pantry" }
+  ],
+  "instructions": [
+    "Place sliced onion and garlic in the bottom of the slow cooker.",
+    "Add chicken on top of the vegetables.",
+    "Season with salt, pepper, paprika, and oregano.",
+    "Pour chicken broth and drizzle olive oil over the top.",
+    "Cover and cook on low for 6 hours or high for 3–4 hours until chicken is tender.",
+    "Remove chicken and shred using two forks.",
+    "Return shredded chicken to the slow cooker and mix with juices.",
+    "Portion into containers for storage."
+  ],
+  "storage": {
+    "fridge_days": 4,
+    "freezer_days": 90,
+    "reheat_instructions": "Reheat in microwave with some cooking liquid to retain moisture, or warm in a skillet over medium heat."
+  },
+  "batch_notes": [
+    "Cook the entire batch at once and shred for easy portioning.",
+    "Keep some cooking liquid with the chicken to maintain moisture during storage."
+  ],
+  "meal_variations": [
+    "BBQ chicken sandwiches with buns and sauce",
+    "Chicken tacos with tortillas and toppings",
+    "Chicken rice bowls with vegetables",
+    "Chicken pasta with simple sauce"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 330,
+  "protein_per_serving": 42,
+  "carbs_per_serving": 4,
+  "fat_per_serving": 14
+}

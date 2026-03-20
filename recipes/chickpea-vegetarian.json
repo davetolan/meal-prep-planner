@@ -1,0 +1,54 @@
+{
+  "title": "Bulk Chickpea and Vegetable Skillet Base",
+  "description": "A simple, protein-rich chickpea and vegetable skillet designed for batch cooking and reuse in bowls, wraps, and salads.",
+  "servings": 8,
+  "prep_time_minutes": 15,
+  "cook_time_minutes": 30,
+  "ingredients": [
+    { "name": "canned chickpeas", "quantity": "4 cans (15 oz), drained and rinsed", "category": "protein" },
+    { "name": "white rice", "quantity": "3 cups dry", "category": "carb" },
+    { "name": "onion", "quantity": "2 medium, diced", "category": "vegetable" },
+    { "name": "bell peppers", "quantity": "2, diced", "category": "vegetable" },
+    { "name": "zucchini", "quantity": "2 medium, diced", "category": "vegetable" },
+    { "name": "garlic", "quantity": "3 cloves, minced", "category": "vegetable" },
+    { "name": "olive oil", "quantity": "2 tbsp", "category": "pantry" },
+    { "name": "salt", "quantity": "1.5 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "paprika", "quantity": "2 tsp", "category": "pantry" }
+  ],
+  "instructions": [
+    "Cook rice according to package instructions.",
+    "Heat olive oil in a large skillet over medium heat.",
+    "Add onion and bell peppers, cook until softened.",
+    "Add zucchini and garlic, cook for 3–5 minutes.",
+    "Add chickpeas and season with salt, pepper, and paprika.",
+    "Cook for 8–10 minutes, stirring occasionally.",
+    "Serve over rice or keep components separate for flexibility.",
+    "Let cool and portion into containers."
+  ],
+  "storage": {
+    "fridge_days": 5,
+    "freezer_days": 60,
+    "reheat_instructions": "Reheat in microwave or skillet with a splash of water or oil to prevent drying."
+  },
+  "batch_notes": [
+    "Cook rice and chickpea mixture in parallel to save time.",
+    "Keep rice separate for more flexible meal variations."
+  ],
+  "meal_variations": [
+    "Chickpea rice bowls with added sauce",
+    "Wraps with tortillas and greens",
+    "Chickpea stir-fry with soy sauce",
+    "Cold chickpea salad with dressing"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 390,
+  "protein_per_serving": 16,
+  "carbs_per_serving": 56,
+  "fat_per_serving": 11
+}

@@ -175,13 +175,13 @@ Aggregating daily totals
 🧪 Development Roadmap
 Phase 1 (MVP)
 
- Seed 10–20 recipes
+ [x] Seed 10–20 recipes
 
- Implement generateMealPlan
+ [x] Implement generateMealPlan
 
- Calculate calories + protein
+ [x] Calculate calories + protein
 
- Basic UI (form + results)
+ [x] Basic UI (form + results)
 
 Phase 2
 

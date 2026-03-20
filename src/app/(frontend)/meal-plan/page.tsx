@@ -43,6 +43,44 @@ export default function MealPlanPage() {
           />
         </div>
 
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium" htmlFor="calorieTarget">
+              Daily calorie target
+            </label>
+            <input
+              className="w-full rounded border px-3 py-2"
+              defaultValue={2200}
+              id="calorieTarget"
+              min={1}
+              name="calorieTarget"
+              step="any"
+              type="number"
+            />
+            <p className="text-sm text-muted-foreground">
+              Optional. The planner will adjust portions to get closer to this average per day.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium" htmlFor="proteinTarget">
+              Daily protein target
+            </label>
+            <input
+              className="w-full rounded border px-3 py-2"
+              defaultValue={180}
+              id="proteinTarget"
+              min={1}
+              name="proteinTarget"
+              step="any"
+              type="number"
+            />
+            <p className="text-sm text-muted-foreground">
+              Optional. Higher protein targets will bias toward larger portions of higher-protein meals.
+            </p>
+          </div>
+        </div>
+
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">Goals</legend>
           {goalOptions.map((goal) => (

@@ -5,6 +5,7 @@ export type GeneratedPlan = {
       type: 'breakfast' | 'lunch' | 'dinner'
       recipeId: string
       recipeTitle: string
+      servings: number
       nutrition: NutritionTotals
     }[]
     nutrition: NutritionTotals
@@ -18,6 +19,14 @@ export type GeneratedPlan = {
   nutritionSummary: {
     total: NutritionTotals
     averagePerDay: NutritionTotals
+    targets?: {
+      calories?: number
+      protein?: number
+    }
+    averageDelta?: {
+      calories?: number
+      protein?: number
+    }
   }
 }
 
@@ -63,6 +72,8 @@ export type GenerateMealPlanOptions = {
   preferences?: string[]
   exclusions?: string[]
   recipeCount?: number
+  calorieTarget?: number
+  proteinTarget?: number
 }
 
 export type MealPlanGenerateRequest = {
@@ -71,6 +82,8 @@ export type MealPlanGenerateRequest = {
   preferences?: string[]
   excludedIngredients?: string[]
   recipeCount?: number
+  calorieTarget?: number
+  proteinTarget?: number
 }
 
 export type MealPlanGenerateResponse = {
@@ -106,11 +119,30 @@ type GroceryAggregate = {
   quantities: string[]
 }
 
+type MacroTargets = {
+  calories?: number
+  protein?: number
+}
+
+type MealAssignment = {
+  type: 'lunch' | 'dinner'
+  recipe: NormalizedRecipe
+  servings: number
+  nutrition: NutritionTotals
+}
+
+type DayTemplate = {
+  meals: MealAssignment[]
+  nutrition: NutritionTotals
+  score: number
+}
+
 const DEFAULT_DAYS = 5
 const MIN_DAYS = 3
 const MAX_DAYS = 5
 const MIN_RECIPE_COUNT = 2
 const MAX_RECIPE_COUNT = 3
+const SERVING_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
 const normalizeText = (value: string): string =>
   value
@@ -192,6 +224,26 @@ function scoreRecipe(recipe: NormalizedRecipe, preferences: string[]): number {
   )
 }
 
+function getMacroTargets(options: GenerateMealPlanOptions): MacroTargets {
+  const calories =
+    typeof options.calorieTarget === 'number' && Number.isFinite(options.calorieTarget) && options.calorieTarget > 0
+      ? options.calorieTarget
+      : undefined
+  const protein =
+    typeof options.proteinTarget === 'number' && Number.isFinite(options.proteinTarget) && options.proteinTarget > 0
+      ? options.proteinTarget
+      : undefined
+
+  return {
+    calories,
+    protein,
+  }
+}
+
+function hasMacroTargets(targets: MacroTargets): boolean {
+  return targets.calories !== undefined || targets.protein !== undefined
+}
+
 function overlapScore(left: NormalizedRecipe, right: NormalizedRecipe): number {
   const shared = left.ingredientKeys.filter((ingredient) => right.ingredientKeys.includes(ingredient))
   return shared.length * 6
@@ -224,18 +276,116 @@ function buildRecipePoolScore(recipes: NormalizedRecipe[], preferences: string[]
   return recipeScore + reuseScore
 }
 
+function scoreNutritionAgainstTargets(nutrition: NutritionTotals, targets: MacroTargets): number {
+  if (!hasMacroTargets(targets)) {
+    return 0
+  }
+
+  let penalty = 0
+
+  if (targets.calories) {
+    penalty += (Math.abs(nutrition.calories - targets.calories) / targets.calories) * 120
+  }
+
+  if (targets.protein) {
+    const proteinGap = Math.abs(nutrition.protein - targets.protein) / targets.protein
+    const underProteinGap = Math.max(0, targets.protein - nutrition.protein) / targets.protein
+    penalty += proteinGap * 160
+    penalty += underProteinGap * 80
+  }
+
+  return -penalty
+}
+
+function multiplyNutrition(nutrition: NutritionTotals, multiplier: number): NutritionTotals {
+  return {
+    calories: roundNutrition(nutrition.calories * multiplier),
+    protein: roundNutrition(nutrition.protein * multiplier),
+    carbs: roundNutrition(nutrition.carbs * multiplier),
+    fat: roundNutrition(nutrition.fat * multiplier),
+  }
+}
+
+function buildDayTemplate(recipePool: NormalizedRecipe[], targets: MacroTargets): DayTemplate {
+  let bestTemplate: DayTemplate | undefined
+
+  for (const lunchRecipe of recipePool) {
+    for (const dinnerRecipe of recipePool) {
+      for (const lunchServings of SERVING_OPTIONS) {
+        for (const dinnerServings of SERVING_OPTIONS) {
+          const meals: MealAssignment[] = [
+            {
+              type: 'lunch',
+              recipe: lunchRecipe,
+              servings: lunchServings,
+              nutrition: multiplyNutrition(getRecipeNutrition(lunchRecipe), lunchServings),
+            },
+            {
+              type: 'dinner',
+              recipe: dinnerRecipe,
+              servings: dinnerServings,
+              nutrition: multiplyNutrition(getRecipeNutrition(dinnerRecipe), dinnerServings),
+            },
+          ]
+          const nutrition = meals.reduce<NutritionTotals>(
+            (totals, meal) => addNutrition(totals, meal.nutrition),
+            { calories: 0, protein: 0, carbs: 0, fat: 0 },
+          )
+
+          let score = scoreNutritionAgainstTargets(nutrition, targets)
+
+          if (lunchRecipe.id !== dinnerRecipe.id) {
+            score += 8
+          }
+
+          if (lunchRecipe.batchable) {
+            score += 4
+          }
+
+          if (dinnerRecipe.batchable) {
+            score += 4
+          }
+
+          if (
+            !bestTemplate ||
+            score > bestTemplate.score ||
+            (score === bestTemplate.score &&
+              `${lunchRecipe.title}|${lunchServings}|${dinnerRecipe.title}|${dinnerServings}` <
+                `${bestTemplate.meals[0]?.recipe.title}|${bestTemplate.meals[0]?.servings}|${bestTemplate.meals[1]?.recipe.title}|${bestTemplate.meals[1]?.servings}`)
+          ) {
+            bestTemplate = {
+              meals,
+              nutrition,
+              score,
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (!bestTemplate) {
+    throw new Error('Unable to build a meal template for this recipe pool.')
+  }
+
+  return bestTemplate
+}
+
 function selectRecipePool(args: {
   recipes: NormalizedRecipe[]
   recipeCount: number
   preferences: string[]
+  targets: MacroTargets
 }): NormalizedRecipe[] {
-  const { recipes, recipeCount, preferences } = args
+  const { recipes, recipeCount, preferences, targets } = args
   let bestPool: NormalizedRecipe[] | undefined
   let bestScore = Number.NEGATIVE_INFINITY
 
   function visit(startIndex: number, pool: NormalizedRecipe[]) {
     if (pool.length === recipeCount) {
-      const poolScore = buildRecipePoolScore(pool, preferences)
+      const poolScore =
+        buildRecipePoolScore(pool, preferences) +
+        buildDayTemplate(pool, targets).score * 3
       const bestPoolKey = bestPool?.map((recipe) => recipe.title).join('|') ?? ''
       const currentPoolKey = pool.map((recipe) => recipe.title).join('|')
 
@@ -263,7 +413,7 @@ function selectRecipePool(args: {
   return bestPool
 }
 
-function buildMealAssignments(recipePool: NormalizedRecipe[], dayCount: number): GeneratedPlan['days'] {
+function buildRotatingMealAssignments(recipePool: NormalizedRecipe[], dayCount: number): GeneratedPlan['days'] {
   return Array.from({ length: dayCount }, (_, index) => {
     const lunch = recipePool[index % recipePool.length]!
     const dinner = recipePool[(index + 1) % recipePool.length]!
@@ -277,12 +427,14 @@ function buildMealAssignments(recipePool: NormalizedRecipe[], dayCount: number):
           type: 'lunch',
           recipeId: lunch.id,
           recipeTitle: lunch.title,
+          servings: 1,
           nutrition: lunchNutrition,
         },
         {
           type: 'dinner',
           recipeId: dinner.id,
           recipeTitle: dinner.title,
+          servings: 1,
           nutrition: dinnerNutrition,
         },
       ],
@@ -291,8 +443,79 @@ function buildMealAssignments(recipePool: NormalizedRecipe[], dayCount: number):
   })
 }
 
-function getBatchCount(recipe: NormalizedRecipe, people: number): number {
-  return Math.max(1, Math.ceil(people / Math.max(1, recipe.servings)))
+function buildTargetedMealAssignments(
+  recipePool: NormalizedRecipe[],
+  dayCount: number,
+  targets: MacroTargets,
+): GeneratedPlan['days'] {
+  const templates = recipePool
+    .flatMap((anchorRecipe) => {
+      const baseTemplate = buildDayTemplate(
+        [
+          anchorRecipe,
+          ...recipePool.filter((recipe) => recipe.id !== anchorRecipe.id),
+        ],
+        targets,
+      )
+
+      return {
+        ...baseTemplate,
+        score:
+          baseTemplate.score +
+          baseTemplate.meals.reduce((total, meal) => {
+            return total + (meal.recipe.id === anchorRecipe.id ? 3 : 0)
+          }, 0),
+      }
+    })
+    .sort((left, right) => right.score - left.score)
+
+  const recipeUsage = new Map<string, number>()
+  let previousTemplateKey = ''
+
+  return Array.from({ length: dayCount }, (_, index) => {
+    let bestTemplate = templates[0]!
+    let bestAdjustedScore = Number.NEGATIVE_INFINITY
+
+    for (const template of templates) {
+      const templateKey = template.meals
+        .map((meal) => `${meal.recipe.id}:${meal.servings}:${meal.type}`)
+        .join('|')
+      const usagePenalty = template.meals.reduce((total, meal) => {
+        return total + (recipeUsage.get(meal.recipe.id) ?? 0) * 1.5
+      }, 0)
+      const repeatPenalty = templateKey === previousTemplateKey ? 6 : 0
+      const adjustedScore = template.score - usagePenalty - repeatPenalty
+
+      if (adjustedScore > bestAdjustedScore) {
+        bestAdjustedScore = adjustedScore
+        bestTemplate = template
+      }
+    }
+
+    previousTemplateKey = bestTemplate.meals
+      .map((meal) => `${meal.recipe.id}:${meal.servings}:${meal.type}`)
+      .join('|')
+
+    bestTemplate.meals.forEach((meal) => {
+      recipeUsage.set(meal.recipe.id, (recipeUsage.get(meal.recipe.id) ?? 0) + 1)
+    })
+
+    return {
+      day: index + 1,
+      meals: bestTemplate.meals.map((meal) => ({
+        type: meal.type,
+        recipeId: meal.recipe.id,
+        recipeTitle: meal.recipe.title,
+        servings: meal.servings,
+        nutrition: meal.nutrition,
+      })),
+      nutrition: bestTemplate.nutrition,
+    }
+  })
+}
+
+function getBatchCount(recipe: NormalizedRecipe, people: number, totalAssignedServings: number): number {
+  return Math.max(1, Math.ceil((people * totalAssignedServings) / Math.max(1, recipe.servings)))
 }
 
 function parseNumericAmount(value: string): number | undefined {
@@ -363,11 +586,43 @@ function summarizeQuantities(quantities: string[]): string | undefined {
     .join(' + ')
 }
 
-function buildGroceryList(selectedMeals: NormalizedRecipe[], people: number): GeneratedPlan['groceryList'] {
-  const aggregates = selectedMeals.reduce<Map<string, GroceryAggregate>>((map, recipe) => {
-    const batchCount = getBatchCount(recipe, people)
+function getRecipeAssignments(days: GeneratedPlan['days'], recipePool: NormalizedRecipe[]) {
+  return days.flatMap((day) =>
+    day.meals.map((meal) => ({
+      recipe: recipePool.find((recipe) => recipe.id === meal.recipeId)!,
+      servings: meal.servings,
+    })),
+  )
+}
 
-    recipe.ingredients.forEach((ingredient) => {
+function summarizeRecipeUsage(days: GeneratedPlan['days'], recipePool: NormalizedRecipe[]) {
+  return getRecipeAssignments(days, recipePool).reduce<Map<string, { recipe: NormalizedRecipe; servings: number }>>(
+    (map, assignment) => {
+      const existing = map.get(assignment.recipe.id)
+      if (existing) {
+        existing.servings += assignment.servings
+        return map
+      }
+
+      map.set(assignment.recipe.id, {
+        recipe: assignment.recipe,
+        servings: assignment.servings,
+      })
+
+      return map
+    },
+    new Map(),
+  )
+}
+
+function buildGroceryList(
+  recipeUsage: Map<string, { recipe: NormalizedRecipe; servings: number }>,
+  people: number,
+): GeneratedPlan['groceryList'] {
+  const aggregates = Array.from(recipeUsage.values()).reduce<Map<string, GroceryAggregate>>((map, usage) => {
+    const batchCount = getBatchCount(usage.recipe, people, usage.servings)
+
+    usage.recipe.ingredients.forEach((ingredient) => {
       const key = normalizeText(ingredient.name)
       const existing = map.get(key)
       const repeatedQuantities = ingredient.quantity ? Array.from({ length: batchCount }, () => ingredient.quantity as string) : []
@@ -434,13 +689,17 @@ function divideNutrition(totals: NutritionTotals, divisor: number): NutritionTot
   }
 }
 
-function buildPrepSteps(selectedMeals: NormalizedRecipe[], people: number): string[] {
-  const frequency = selectedMeals.reduce<Map<string, number>>((map, recipe) => {
-    map.set(recipe.id, (map.get(recipe.id) ?? 0) + getBatchCount(recipe, people))
+function buildPrepSteps(
+  recipeUsage: Map<string, { recipe: NormalizedRecipe; servings: number }>,
+  people: number,
+): string[] {
+  const frequency = Array.from(recipeUsage.values()).reduce<Map<string, number>>((map, usage) => {
+    map.set(usage.recipe.id, getBatchCount(usage.recipe, people, usage.servings))
     return map
   }, new Map())
 
-  const uniqueRecipes = dedupe(selectedMeals)
+  const uniqueRecipes = Array.from(recipeUsage.values())
+    .map((usage) => usage.recipe)
     .slice()
     .sort((left, right) => {
       const frequencyCompare = (frequency.get(right.id) ?? 0) - (frequency.get(left.id) ?? 0)
@@ -480,6 +739,7 @@ export function generateMealPlan(
   const preferences = (options.preferences ?? []).map(normalizeText).filter(Boolean)
   const exclusions = (options.exclusions ?? []).map(normalizeText).filter(Boolean)
   const recipeCount = getRecipeCount(dayCount, options.recipeCount)
+  const targets = getMacroTargets(options)
 
   const normalizedRecipes = recipes
     .map(normalizeRecipe)
@@ -505,11 +765,12 @@ export function generateMealPlan(
     recipes: normalizedRecipes,
     recipeCount,
     preferences,
+    targets,
   })
-  const days = buildMealAssignments(recipePool, dayCount)
-  const selectedRecipes = days.flatMap((day) =>
-    day.meals.map((meal) => recipePool.find((recipe) => recipe.id === meal.recipeId)!),
-  )
+  const days = hasMacroTargets(targets)
+    ? buildTargetedMealAssignments(recipePool, dayCount, targets)
+    : buildRotatingMealAssignments(recipePool, dayCount)
+  const recipeUsage = summarizeRecipeUsage(days, recipePool)
 
   const totalNutrition = days.reduce<NutritionTotals>(
     (totals, day) => addNutrition(totals, day.nutrition),
@@ -518,11 +779,24 @@ export function generateMealPlan(
 
   return {
     days,
-    groceryList: buildGroceryList(selectedRecipes, people),
-    prepSteps: buildPrepSteps(selectedRecipes, people),
+    groceryList: buildGroceryList(recipeUsage, people),
+    prepSteps: buildPrepSteps(recipeUsage, people),
     nutritionSummary: {
       total: totalNutrition,
       averagePerDay: divideNutrition(totalNutrition, days.length),
+      ...(hasMacroTargets(targets)
+        ? {
+            targets,
+            averageDelta: {
+              calories: targets.calories
+                ? roundNutrition(divideNutrition(totalNutrition, days.length).calories - targets.calories)
+                : undefined,
+              protein: targets.protein
+                ? roundNutrition(divideNutrition(totalNutrition, days.length).protein - targets.protein)
+                : undefined,
+            },
+          }
+        : {}),
     },
   }
 }

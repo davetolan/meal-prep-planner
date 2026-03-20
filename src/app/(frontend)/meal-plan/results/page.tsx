@@ -7,6 +7,8 @@ import { loadPlannerRecipes } from '@/utilities/loadPlannerRecipes'
 type SearchParams = Promise<{
   days?: string
   people?: string
+  calorieTarget?: string
+  proteinTarget?: string
   preferences?: string | string[]
   excludedIngredients?: string
 }>
@@ -30,6 +32,15 @@ function parseExcludedIngredients(value?: string): string[] {
     .filter(Boolean)
 }
 
+function parseNumber(value?: string): number | undefined {
+  if (!value) {
+    return undefined
+  }
+
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
+}
+
 export default async function MealPlanResultsPage({
   searchParams,
 }: {
@@ -41,9 +52,13 @@ export default async function MealPlanResultsPage({
   const plan = generateMealPlan(recipes, {
     days: Number(params.days) || 4,
     people: Number(params.people) || 2,
+    calorieTarget: parseNumber(params.calorieTarget),
+    proteinTarget: parseNumber(params.proteinTarget),
     preferences: toArray(params.preferences),
     exclusions: parseExcludedIngredients(params.excludedIngredients),
   })
+  const calorieDelta = plan.nutritionSummary.averageDelta?.calories
+  const proteinDelta = plan.nutritionSummary.averageDelta?.protein
 
   return (
     <main className="container py-12">
@@ -65,6 +80,18 @@ export default async function MealPlanResultsPage({
               <li>Protein: {plan.nutritionSummary.averagePerDay.protein}g</li>
               <li>Carbs: {plan.nutritionSummary.averagePerDay.carbs}g</li>
               <li>Fat: {plan.nutritionSummary.averagePerDay.fat}g</li>
+              {plan.nutritionSummary.targets?.calories ? (
+                <li>
+                  Calorie target delta: {calorieDelta && calorieDelta > 0 ? '+' : ''}
+                  {calorieDelta}
+                </li>
+              ) : null}
+              {plan.nutritionSummary.targets?.protein ? (
+                <li>
+                  Protein target delta: {proteinDelta && proteinDelta > 0 ? '+' : ''}
+                  {proteinDelta}g
+                </li>
+              ) : null}
             </ul>
           </div>
 
@@ -89,7 +116,8 @@ export default async function MealPlanResultsPage({
               <ul className="list-disc pl-6">
                 {day.meals.map((meal) => (
                   <li key={`${day.day}-${meal.type}`}>
-                    {meal.type}: {meal.recipeTitle} ({meal.nutrition.calories} cal, {meal.nutrition.protein}g protein)
+                    {meal.type}: {meal.recipeTitle} ({meal.servings} serving{meal.servings === 1 ? '' : 's'},{' '}
+                    {meal.nutrition.calories} cal, {meal.nutrition.protein}g protein)
                   </li>
                 ))}
               </ul>

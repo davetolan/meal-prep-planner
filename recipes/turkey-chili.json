@@ -1,0 +1,57 @@
+{
+  "title": "Bulk Turkey Chili",
+  "description": "A hearty, high-protein turkey chili designed for batch cooking, easy storage, and reuse across multiple meals.",
+  "servings": 8,
+  "prep_time_minutes": 15,
+  "cook_time_minutes": 45,
+  "ingredients": [
+    { "name": "ground turkey", "quantity": "3 lbs", "category": "protein" },
+    { "name": "black beans", "quantity": "2 cans (15 oz), drained", "category": "protein" },
+    { "name": "kidney beans", "quantity": "1 can (15 oz), drained", "category": "protein" },
+    { "name": "diced tomatoes", "quantity": "2 cans (14.5 oz)", "category": "pantry" },
+    { "name": "tomato sauce", "quantity": "1 can (15 oz)", "category": "pantry" },
+    { "name": "onion", "quantity": "1 large, diced", "category": "vegetable" },
+    { "name": "bell peppers", "quantity": "2, diced", "category": "vegetable" },
+    { "name": "garlic", "quantity": "3 cloves, minced", "category": "vegetable" },
+    { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+    { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "chili powder", "quantity": "2 tbsp", "category": "pantry" },
+    { "name": "cumin", "quantity": "2 tsp", "category": "pantry" }
+  ],
+  "instructions": [
+    "Heat olive oil in a large pot over medium heat.",
+    "Add onion and bell peppers, cook until softened.",
+    "Add garlic and cook for 1 minute.",
+    "Add ground turkey and cook until browned, breaking it apart.",
+    "Season with salt, pepper, chili powder, and cumin.",
+    "Stir in diced tomatoes, tomato sauce, and beans.",
+    "Simmer for 25–30 minutes, stirring occasionally.",
+    "Let cool slightly and portion into containers."
+  ],
+  "storage": {
+    "fridge_days": 5,
+    "freezer_days": 90,
+    "reheat_instructions": "Reheat on stovetop or microwave until hot, adding a splash of water if needed."
+  },
+  "batch_notes": [
+    "Cook entire pot at once and divide into portions.",
+    "Flavor improves after sitting, making it ideal for multi-day meals."
+  ],
+  "meal_variations": [
+    "Serve as chili bowls",
+    "Top baked potatoes with chili",
+    "Use as filling for wraps or burritos",
+    "Serve over rice for added carbs"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 410,
+  "protein_per_serving": 36,
+  "carbs_per_serving": 24,
+  "fat_per_serving": 16
+}

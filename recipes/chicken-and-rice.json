@@ -1,0 +1,54 @@
+{
+  "title": "Bulk Chicken and Rice Meal Prep Base",
+  "description": "A simple, high-protein chicken and rice base designed for batch cooking and reuse across multiple meals like bowls, wraps, and stir-fries.",
+  "servings": 8,
+  "prep_time_minutes": 20,
+  "cook_time_minutes": 45,
+  "ingredients": [
+    { "name": "chicken breast", "quantity": "4 lbs", "category": "protein" },
+    { "name": "white rice", "quantity": "3 cups dry", "category": "carb" },
+    { "name": "olive oil", "quantity": "2 tbsp", "category": "pantry" },
+    { "name": "onion", "quantity": "2 large, diced", "category": "vegetable" },
+    { "name": "bell peppers", "quantity": "3, sliced", "category": "vegetable" },
+    { "name": "garlic", "quantity": "4 cloves, minced", "category": "vegetable" },
+    { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "paprika", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "chicken broth or water", "quantity": "6 cups", "category": "pantry" }
+  ],
+  "instructions": [
+    "Cook rice according to package instructions using water or chicken broth.",
+    "Season chicken with salt, pepper, and paprika.",
+    "Heat oil in a large pan or pot over medium heat.",
+    "Cook chicken in batches until fully cooked, then remove and set aside.",
+    "In the same pan, sauté onions, peppers, and garlic until softened.",
+    "Slice or shred the cooked chicken.",
+    "Combine chicken with vegetables or keep separate for flexible use.",
+    "Portion rice and chicken mixture into containers for storage."
+  ],
+  "storage": {
+    "fridge_days": 4,
+    "freezer_days": 90,
+    "reheat_instructions": "Microwave with a splash of water or broth for 1-2 minutes, or heat in a skillet over medium heat until warmed through."
+  },
+  "batch_notes": [
+    "Cook all chicken at once and portion for multiple meals.",
+    "Rice and vegetables can be reused across bowls, wraps, and stir-fries."
+  ],
+  "meal_variations": [
+    "Chicken rice bowls with added sauce or dressing",
+    "Chicken wraps with tortillas and lettuce",
+    "Quick chicken stir-fry with soy sauce",
+    "Chicken burrito bowls with beans and salsa"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 520,
+  "protein_per_serving": 45,
+  "carbs_per_serving": 38,
+  "fat_per_serving": 16
+}

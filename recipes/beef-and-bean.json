@@ -1,0 +1,57 @@
+{
+  "title": "Bulk Ground Beef and Bean Skillet Base",
+  "description": "A hearty, high-protein ground beef and bean mixture designed for batch cooking and easy reuse in tacos, bowls, pasta, and more.",
+  "servings": 8,
+  "prep_time_minutes": 15,
+  "cook_time_minutes": 40,
+  "ingredients": [
+    { "name": "ground beef (80/20 or leaner)", "quantity": "3 lbs", "category": "protein" },
+    { "name": "black beans", "quantity": "2 cans (15 oz), drained", "category": "protein" },
+    { "name": "kidney beans", "quantity": "1 can (15 oz), drained", "category": "protein" },
+    { "name": "onion", "quantity": "2 medium, diced", "category": "vegetable" },
+    { "name": "bell peppers", "quantity": "2, diced", "category": "vegetable" },
+    { "name": "garlic", "quantity": "4 cloves, minced", "category": "vegetable" },
+    { "name": "diced tomatoes", "quantity": "2 cans (14.5 oz)", "category": "pantry" },
+    { "name": "olive oil", "quantity": "1 tbsp", "category": "pantry" },
+    { "name": "salt", "quantity": "2 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "chili powder", "quantity": "2 tbsp", "category": "pantry" },
+    { "name": "cumin", "quantity": "2 tsp", "category": "pantry" }
+  ],
+  "instructions": [
+    "Heat oil in a large pot or skillet over medium heat.",
+    "Add diced onion and bell peppers, cook until softened.",
+    "Add garlic and cook for 1 minute.",
+    "Add ground beef and cook until browned, breaking it apart as it cooks.",
+    "Drain excess fat if needed.",
+    "Stir in salt, pepper, chili powder, and cumin.",
+    "Add diced tomatoes and beans, stir to combine.",
+    "Simmer for 15–20 minutes to allow flavors to develop.",
+    "Let cool slightly, then portion into containers."
+  ],
+  "storage": {
+    "fridge_days": 4,
+    "freezer_days": 90,
+    "reheat_instructions": "Microwave for 1-2 minutes stirring halfway, or reheat in a skillet over medium heat until warmed through."
+  },
+  "batch_notes": [
+    "Cook the full batch at once and divide into meal-sized portions.",
+    "This base can be used across multiple meals without additional cooking."
+  ],
+  "meal_variations": [
+    "Tacos with tortillas and shredded cheese",
+    "Burrito bowls with rice and toppings",
+    "Loaded baked potatoes with beef mixture",
+    "Pasta with beef and tomato sauce base"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 470,
+  "protein_per_serving": 38,
+  "carbs_per_serving": 22,
+  "fat_per_serving": 24
+}

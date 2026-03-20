@@ -16,6 +16,8 @@ export async function POST(request: Request): Promise<Response> {
     const plan = generateMealPlan(recipes, {
       days: body.days,
       people: body.people,
+      calorieTarget: body.calorieTarget,
+      proteinTarget: body.proteinTarget,
       preferences: body.preferences,
       exclusions: body.excludedIngredients,
     })

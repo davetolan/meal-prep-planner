@@ -1,0 +1,51 @@
+{
+  "title": "Bulk Buffalo Shredded Chicken Base",
+  "description": "Tender shredded chicken tossed in mild buffalo sauce, designed for batch cooking and easy reuse in wraps, bowls, sandwiches, and more.",
+  "servings": 8,
+  "prep_time_minutes": 10,
+  "cook_time_minutes": 30,
+  "ingredients": [
+    { "name": "chicken breast", "quantity": "4 lbs", "category": "protein" },
+    { "name": "buffalo sauce", "quantity": "1 cup", "category": "pantry" },
+    { "name": "butter", "quantity": "2 tbsp", "category": "dairy" },
+    { "name": "garlic powder", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "onion powder", "quantity": "1 tsp", "category": "pantry" },
+    { "name": "salt", "quantity": "1.5 tsp", "category": "pantry" },
+    { "name": "black pepper", "quantity": "1 tsp", "category": "pantry" }
+  ],
+  "instructions": [
+    "Place chicken in a large pot or pan and cook until fully cooked (boil, bake, or pan cook).",
+    "Remove chicken and shred using two forks.",
+    "In the same pot, melt butter over low heat.",
+    "Add buffalo sauce, garlic powder, onion powder, salt, and pepper.",
+    "Return shredded chicken to the pot and mix until evenly coated.",
+    "Simmer for 5–10 minutes to absorb flavor.",
+    "Let cool slightly and portion into containers."
+  ],
+  "storage": {
+    "fridge_days": 4,
+    "freezer_days": 90,
+    "reheat_instructions": "Reheat in microwave or skillet with a splash of water or extra sauce to maintain moisture."
+  },
+  "batch_notes": [
+    "Cook and shred all chicken at once for efficient prep.",
+    "Keep extra buffalo sauce separate to refresh flavor when reheating."
+  ],
+  "meal_variations": [
+    "Buffalo chicken wraps with lettuce and ranch",
+    "Buffalo chicken rice bowls",
+    "Buffalo chicken sandwiches or sliders",
+    "Buffalo chicken quesadillas",
+    "Buffalo chicken salad"
+  ],
+  "tags": [
+    "high-protein",
+    "budget",
+    "kid-friendly",
+    "batch-cooking"
+  ],
+  "calories_per_serving": 360,
+  "protein_per_serving": 42,
+  "carbs_per_serving": 3,
+  "fat_per_serving": 19
+}
